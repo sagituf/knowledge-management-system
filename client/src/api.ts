@@ -44,3 +44,7 @@ export async function deleteAsset(id: string): Promise<void> {
 export function rawUrl(id: string): string {
   return `/api/assets/${id}/raw`;
 }
+
+export function downloadUrl(id: string): string {
+  return `/api/assets/${id}/download`;
+}

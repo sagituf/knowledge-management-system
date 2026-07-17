@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Asset } from "../api.ts";
-import { rawUrl, deleteAsset } from "../api.ts";
+import { rawUrl, downloadUrl, deleteAsset } from "../api.ts";
 
 export function AssetDetail({
   asset,
@@ -63,6 +63,9 @@ export function AssetDetail({
             </section>
 
             <div className="detail-actions">
+              <a className="btn" href={downloadUrl(asset.id)} download={asset.originalName}>
+                Download
+              </a>
               <button className="btn btn-danger" onClick={handleDelete} disabled={busy}>
                 {busy ? "Deleting…" : "Delete"}
               </button>
