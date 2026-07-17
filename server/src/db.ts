@@ -52,12 +52,21 @@ function rowToAsset(r: Row): Asset {
   };
 }
 
+const ASSET_COLUMNS = `id, kind, original_name, stored_name, mime_type, size_bytes,
+  created_at, description, tags, keywords, extracted_text, ai_generated`;
+
+// Prepared once at module scope and reused across calls, rather than
+// re-preparing the same statement on every invocation.
+const insertStmt = db.prepare(`
+  INSERT INTO assets (${ASSET_COLUMNS})
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
+const listStmt = db.prepare(`SELECT ${ASSET_COLUMNS} FROM assets ORDER BY created_at DESC`);
+const getStmt = db.prepare(`SELECT ${ASSET_COLUMNS} FROM assets WHERE id = ?`);
+const deleteStmt = db.prepare(`DELETE FROM assets WHERE id = ?`);
+
 export function insertAsset(a: Asset): void {
-  db.prepare(`
-    INSERT INTO assets (id, kind, original_name, stored_name, mime_type,
-      size_bytes, created_at, description, tags, keywords, extracted_text, ai_generated)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
+  insertStmt.run(
     a.id, a.kind, a.originalName, a.storedName, a.mimeType,
     a.sizeBytes, a.createdAt, a.description, JSON.stringify(a.tags),
     JSON.stringify(a.keywords), a.extractedText, a.aiGenerated ? 1 : 0,
@@ -65,17 +74,17 @@ export function insertAsset(a: Asset): void {
 }
 
 export function listAssets(): Asset[] {
-  const rows = db.prepare(`SELECT * FROM assets ORDER BY created_at DESC`).all() as unknown as Row[];
+  const rows = listStmt.all() as unknown as Row[];
   return rows.map(rowToAsset);
 }
 
 export function getAsset(id: string): Asset | undefined {
-  const row = db.prepare(`SELECT * FROM assets WHERE id = ?`).get(id) as unknown as Row | undefined;
+  const row = getStmt.get(id) as unknown as Row | undefined;
   return row ? rowToAsset(row) : undefined;
 }
 
 /** Delete an asset row. Returns true if a row was removed. */
 export function deleteAsset(id: string): boolean {
-  const info = db.prepare(`DELETE FROM assets WHERE id = ?`).run(id);
+  const info = deleteStmt.run(id);
   return info.changes > 0;
 }
