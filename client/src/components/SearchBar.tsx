@@ -4,6 +4,7 @@ export function SearchBar({ value, onChange }: { value: string; onChange: (v: st
       className="search-bar"
       type="search"
       placeholder="Search knowledge… (e.g. black hair, document)"
+      aria-label="Search assets"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />

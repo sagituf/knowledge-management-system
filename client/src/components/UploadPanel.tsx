@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { uploadAsset } from "../api.ts";
+import { errorMessage } from "../util.ts";
 
 export function UploadPanel({
   onUploaded,
@@ -19,10 +20,10 @@ export function UploadPanel({
     try {
       for (const file of Array.from(files)) {
         await uploadAsset(file);
+        onUploaded();
       }
-      onUploaded();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "upload failed");
+      setError(errorMessage(e, "upload failed"));
     } finally {
       setBusy(false);
       onBusyChange?.(false);
