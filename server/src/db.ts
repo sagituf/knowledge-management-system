@@ -1,6 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { config } from "./config.ts";
 import type { Asset } from "./types.ts";
+
+// Ensure the data directory exists before opening the database. This module is
+// imported (and runs) before index.ts's body, so a fresh environment with an
+// empty/absent DATA_DIR would otherwise fail with "unable to open database file".
+fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
 
 const db = new DatabaseSync(config.dbPath);
 
