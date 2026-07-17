@@ -7,18 +7,13 @@ import { config } from "./config.ts";
 import { insertAsset, listAssets, getAsset } from "./db.ts";
 import { searchAssets } from "./search.ts";
 import { generateImageMetadata, generateTextMetadata } from "./ai.ts";
-import type { Asset, AssetKind } from "./types.ts";
+import { classifyUpload, SUPPORTED_IMAGE_TYPES } from "./mime.ts";
+import type { Asset } from "./types.ts";
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 15 * 1024 * 1024 },
 });
-
-function classify(mimeType: string): AssetKind | null {
-  if (mimeType.startsWith("image/")) return "image";
-  if (mimeType.startsWith("text/")) return "text";
-  return null;
-}
 
 export const router = express.Router();
 
@@ -54,9 +49,11 @@ router.post("/assets", upload.single("file"), async (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: "no file uploaded" });
 
-  const kind = classify(file.mimetype);
+  const kind = classifyUpload(file.mimetype);
   if (!kind) {
-    return res.status(400).json({ error: `unsupported file type: ${file.mimetype}` });
+    return res.status(400).json({
+      error: `unsupported file type: ${file.mimetype}. Supported: text files, and ${SUPPORTED_IMAGE_TYPES.join(", ")} images.`,
+    });
   }
 
   const id = nanoid();
