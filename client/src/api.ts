@@ -41,15 +41,6 @@ export async function deleteAsset(id: string): Promise<void> {
   if (!r.ok) throw new Error("delete failed");
 }
 
-export async function reevaluateAsset(id: string): Promise<Asset> {
-  const r = await fetch(`/api/assets/${id}/reevaluate`, { method: "POST" });
-  if (!r.ok) {
-    const body = await r.json().catch(() => ({}));
-    throw new Error(body.error ?? "re-evaluation failed");
-  }
-  return r.json();
-}
-
 export function rawUrl(id: string): string {
   return `/api/assets/${id}/raw`;
 }

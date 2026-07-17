@@ -28,13 +28,13 @@ export function UploadPanel({ onUploaded }: { onUploaded: () => void }) {
         <input
           type="file"
           multiple
-          accept="image/jpeg,image/png,image/gif,image/webp,text/*,.txt,.md"
+          accept="image/*,text/*,.txt,.md"
           disabled={busy}
           onChange={(e) => handleFiles(e.target.files)}
           hidden
         />
       </label>
-      <span className="hint">Text files or JPEG/PNG/GIF/WEBP images</span>
+      <span className="hint">Images or text files</span>
       {error && <span className="error">{error}</span>}
     </div>
   );

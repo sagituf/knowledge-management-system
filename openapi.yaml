@@ -51,9 +51,10 @@ paths:
       summary: Upload a file
       description: >
         Upload a single text or image file (multipart field `file`). The file is
-        stored and Claude generates metadata on upload. If AI is unavailable or no
-        key is set, the asset is still created with empty metadata and
-        `aiGenerated: false`.
+        stored and Claude generates metadata on upload. If metadata cannot be
+        generated — the AI is unavailable, or the image is in a format Claude
+        cannot read (only jpeg/png/gif/webp are supported) — the asset is still
+        created with `aiGenerated: false` and the reason placed in `description`.
       operationId: uploadAsset
       requestBody:
         required: true
@@ -67,9 +68,10 @@ paths:
                   type: string
                   format: binary
                   description: >
-                    A text file (`text/*`) or an image in a Claude-vision-supported
-                    format (`image/jpeg`, `image/png`, `image/gif`, `image/webp`).
-                    Max 15 MB. Other types return 400.
+                    A text file (`text/*`) or an image (`image/*`). Max 15 MB.
+                    Images in formats Claude can't read (e.g. AVIF/HEIC) are still
+                    stored, but without AI metadata. Non-text/non-image types
+                    return 400.
       responses:
         "201":
           description: Asset created.
@@ -141,38 +143,6 @@ paths:
           description: Deleted.
         "404":
           description: No asset with that id.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /assets/{id}/reevaluate:
-    post:
-      summary: Re-generate AI metadata for an asset
-      description: >
-        Re-runs Claude on the stored file and overwrites the asset's description,
-        tags, and keywords. Useful for assets whose metadata generation failed
-        transiently (e.g. before credits were available).
-      operationId: reevaluateAsset
-      parameters:
-        - $ref: "#/components/parameters/AssetId"
-      responses:
-        "200":
-          description: The updated asset.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Asset"
-        "400":
-          description: >
-            The asset is an image in a format Claude vision cannot process
-            (only jpeg/png/gif/webp are supported).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: Asset or underlying file not found.
           content:
             application/json:
               schema:
@@ -252,7 +222,9 @@ components:
           format: date-time
         description:
           type: string
-          description: AI-generated description (empty when aiGenerated is false).
+          description: >
+            AI-generated description. When aiGenerated is false, holds a short
+            explanation of why metadata could not be generated.
         tags:
           type: array
           items:

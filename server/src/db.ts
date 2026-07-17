@@ -79,13 +79,3 @@ export function deleteAsset(id: string): boolean {
   const info = db.prepare(`DELETE FROM assets WHERE id = ?`).run(id);
   return info.changes > 0;
 }
-
-/** Overwrite an asset's AI-generated metadata (used when re-evaluating). */
-export function updateAssetMetadata(
-  id: string,
-  m: { description: string; tags: string[]; keywords: string[]; aiGenerated: boolean },
-): void {
-  db.prepare(
-    `UPDATE assets SET description = ?, tags = ?, keywords = ?, ai_generated = ? WHERE id = ?`,
-  ).run(m.description, JSON.stringify(m.tags), JSON.stringify(m.keywords), m.aiGenerated ? 1 : 0, id);
-}
