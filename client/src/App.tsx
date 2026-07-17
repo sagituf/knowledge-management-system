@@ -30,7 +30,13 @@ export default function App() {
         <SearchBar value={query} onChange={setQuery} />
       </div>
       <Gallery assets={assets} onSelect={setSelected} />
-      {selected && <AssetDetail asset={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <AssetDetail
+          asset={selected}
+          onClose={() => setSelected(null)}
+          onChanged={refresh}
+        />
+      )}
     </main>
   );
 }

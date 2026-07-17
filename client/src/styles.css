@@ -25,3 +25,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 24px; }
 .detail-text { white-space: pre-wrap; background: #f8fafc; color: #0f172a; padding: 12px; border-radius: 8px; max-height: 300px; overflow: auto; }
 .meta h3 { margin: 12px 0 4px; font-size: .8rem; text-transform: uppercase; color: #64748b; }
 .note { color: #b45309; font-size: .85rem; }
+.detail-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn { padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: #f1f5f9; color: #0f172a; cursor: pointer; font-size: .9rem; }
+.btn:disabled { opacity: .6; cursor: default; }
+.btn-danger { background: #dc2626; border-color: #dc2626; color: #fff; }

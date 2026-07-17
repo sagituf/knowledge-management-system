@@ -66,7 +66,10 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: A text (`text/*`) or image (`image/*`) file. Max 15 MB.
+                  description: >
+                    A text file (`text/*`) or an image in a Claude-vision-supported
+                    format (`image/jpeg`, `image/png`, `image/gif`, `image/webp`).
+                    Max 15 MB. Other types return 400.
       responses:
         "201":
           description: Asset created.
@@ -123,6 +126,53 @@ paths:
                 $ref: "#/components/schemas/Asset"
         "404":
           description: No asset with that id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an asset
+      description: Removes the asset's metadata row and its stored file.
+      operationId: deleteAsset
+      parameters:
+        - $ref: "#/components/parameters/AssetId"
+      responses:
+        "204":
+          description: Deleted.
+        "404":
+          description: No asset with that id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /assets/{id}/reevaluate:
+    post:
+      summary: Re-generate AI metadata for an asset
+      description: >
+        Re-runs Claude on the stored file and overwrites the asset's description,
+        tags, and keywords. Useful for assets whose metadata generation failed
+        transiently (e.g. before credits were available).
+      operationId: reevaluateAsset
+      parameters:
+        - $ref: "#/components/parameters/AssetId"
+      responses:
+        "200":
+          description: The updated asset.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+        "400":
+          description: >
+            The asset is an image in a format Claude vision cannot process
+            (only jpeg/png/gif/webp are supported).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Asset or underlying file not found.
           content:
             application/json:
               schema:
