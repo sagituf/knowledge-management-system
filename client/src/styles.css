@@ -29,3 +29,26 @@ main { max-width: 1100px; margin: 0 auto; padding: 24px; }
 .btn { padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: #f1f5f9; color: #0f172a; cursor: pointer; font-size: .9rem; }
 .btn:disabled { opacity: .6; cursor: default; }
 .btn-danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+
+/* Upload status row: fixed height so the spinner never pushes the gallery down. */
+.controls { margin-bottom: 10px; }
+.upload-status { min-height: 24px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.upload-status-text { color: #64748b; font-size: .85rem; }
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid #cbd5e1; border-top-color: #2563eb;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Detail view: preview on the left, details on the right (no scroll for details). */
+.modal-detail { max-width: 1000px; }
+.detail-body { display: flex; gap: 24px; align-items: flex-start; }
+.detail-left { flex: 1 1 55%; min-width: 0; }
+.detail-right { flex: 1 1 45%; min-width: 0; }
+.detail-title { margin-top: 0; word-break: break-word; }
+.detail-img { max-height: 70vh; object-fit: contain; }
+.detail-text { max-height: 70vh; }
+@media (max-width: 720px) {
+  .detail-body { flex-direction: column; }
+}

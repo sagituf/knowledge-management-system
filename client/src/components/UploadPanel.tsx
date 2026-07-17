@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { uploadAsset } from "../api.ts";
 
-export function UploadPanel({ onUploaded }: { onUploaded: () => void }) {
+export function UploadPanel({
+  onUploaded,
+  onBusyChange,
+}: {
+  onUploaded: () => void;
+  onBusyChange?: (busy: boolean) => void;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setBusy(true);
+    onBusyChange?.(true);
     setError(null);
     try {
       for (const file of Array.from(files)) {
@@ -18,6 +25,7 @@ export function UploadPanel({ onUploaded }: { onUploaded: () => void }) {
       setError(e instanceof Error ? e.message : "upload failed");
     } finally {
       setBusy(false);
+      onBusyChange?.(false);
     }
   }
 

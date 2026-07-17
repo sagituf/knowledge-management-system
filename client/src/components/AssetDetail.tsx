@@ -40,30 +40,36 @@ export function AssetDetail({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-detail" onClick={(e) => e.stopPropagation()}>
         <button className="close" onClick={onClose}>×</button>
-        <h2>{asset.originalName}</h2>
-        {asset.kind === "image" ? (
-          <img className="detail-img" src={rawUrl(asset.id)} alt={asset.description} />
-        ) : (
-          <pre className="detail-text">{text}</pre>
-        )}
+        <div className="detail-body">
+          <div className="detail-left">
+            {asset.kind === "image" ? (
+              <img className="detail-img" src={rawUrl(asset.id)} alt={asset.description} />
+            ) : (
+              <pre className="detail-text">{text}</pre>
+            )}
+          </div>
 
-        <div className="detail-actions">
-          <button className="btn btn-danger" onClick={handleDelete} disabled={busy}>
-            {busy ? "Deleting…" : "Delete"}
-          </button>
+          <div className="detail-right">
+            <h2 className="detail-title">{asset.originalName}</h2>
+            <section className="meta">
+              <h3>Description</h3>
+              <p className={asset.aiGenerated ? undefined : "note"}>{asset.description || "—"}</p>
+              <h3>Tags</h3>
+              <p>{asset.tags.length ? asset.tags.join(", ") : "—"}</p>
+              <h3>Keywords</h3>
+              <p>{asset.keywords.length ? asset.keywords.join(", ") : "—"}</p>
+            </section>
+
+            <div className="detail-actions">
+              <button className="btn btn-danger" onClick={handleDelete} disabled={busy}>
+                {busy ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+            {error && <p className="error">{error}</p>}
+          </div>
         </div>
-        {error && <p className="error">{error}</p>}
-
-        <section className="meta">
-          <h3>Description</h3>
-          <p className={asset.aiGenerated ? undefined : "note"}>{asset.description || "—"}</p>
-          <h3>Tags</h3>
-          <p>{asset.tags.length ? asset.tags.join(", ") : "—"}</p>
-          <h3>Keywords</h3>
-          <p>{asset.keywords.length ? asset.keywords.join(", ") : "—"}</p>
-        </section>
       </div>
     </div>
   );
