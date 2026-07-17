@@ -1,7 +1,5 @@
 # Knowledge Management System Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Build a containerized knowledge system that stores uploaded text/image files, uses Claude to generate searchable metadata on upload, and supports keyword search over that metadata.
 
 **Architecture:** Single full-stack Node/TypeScript container. Express serves a JSON API and the built React/Vite frontend. Metadata lives in a built-in `node:sqlite` database; uploaded files live on disk. On upload, Claude (vision) generates a description, tags, and keywords that power keyword search.

@@ -8,8 +8,8 @@ A knowledge system: upload text/image files, Claude generates searchable metadat
 (description/tags/keywords) on upload, and keyword search runs over that metadata.
 Single full-stack container — an Express (TypeScript) server exposes a JSON API
 under `/api` and also serves the built React/Vite client. Design and plan live in
-`docs/superpowers/specs/` and `docs/superpowers/plans/`; the HTTP API is described
-in `openapi.yaml` at the repo root.
+`docs/specs/` and `docs/plans/`; the HTTP API is described in `openapi.yaml` at
+the repo root.
 
 ## Commands
 
