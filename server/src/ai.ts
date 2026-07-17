@@ -56,9 +56,11 @@ async function callClaude(content: Anthropic.MessageParam["content"]): Promise<G
   }
 }
 
+type SupportedImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+
 export function generateImageMetadata(base64: string, mediaType: string): Promise<GeneratedMetadata> {
   return callClaude([
-    { type: "image", source: { type: "base64", media_type: mediaType as "image/png", data: base64 } },
+    { type: "image", source: { type: "base64", media_type: mediaType as SupportedImageMediaType, data: base64 } },
     { type: "text", text: IMAGE_PROMPT },
   ]);
 }

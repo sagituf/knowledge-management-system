@@ -12,8 +12,10 @@ const dataDir = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
   : path.resolve(serverRoot, "..", "data");
 
+const parsedPort = Number(process.env.PORT ?? 3000);
+
 export const config = {
-  port: Number(process.env.PORT ?? 3000),
+  port: Number.isNaN(parsedPort) ? 3000 : parsedPort,
   dataDir,
   uploadsDir: path.join(dataDir, "uploads"),
   dbPath: path.join(dataDir, "knowledge.db"),
