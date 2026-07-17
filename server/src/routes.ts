@@ -50,6 +50,15 @@ router.get("/assets/:id/raw", (req, res) => {
   res.sendFile(filePath);
 });
 
+// Force a download (Content-Disposition: attachment) with the original filename.
+router.get("/assets/:id/download", (req, res) => {
+  const asset = getAsset(req.params.id);
+  if (!asset) return res.status(404).json({ error: "not found" });
+  const filePath = path.join(config.uploadsDir, asset.storedName);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "file missing" });
+  res.download(filePath, asset.originalName);
+});
+
 router.post("/assets", upload.single("file"), async (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: "no file uploaded" });

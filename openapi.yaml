@@ -173,6 +173,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /assets/{id}/download:
+    get:
+      summary: Download the file
+      description: Serves the stored file as an attachment (with its original filename).
+      operationId: downloadAsset
+      parameters:
+        - $ref: "#/components/parameters/AssetId"
+      responses:
+        "200":
+          description: The file, as an attachment.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Asset or underlying file not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   parameters:
     AssetId:
