@@ -29,3 +29,14 @@ main { max-width: 1100px; margin: 0 auto; padding: 24px; }
 .btn { padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: #f1f5f9; color: #0f172a; cursor: pointer; font-size: .9rem; }
 .btn:disabled { opacity: .6; cursor: default; }
 .btn-danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+
+/* Upload status row: fixed height so the spinner never pushes the gallery down. */
+.controls { margin-bottom: 10px; }
+.upload-status { min-height: 24px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.upload-status-text { color: #64748b; font-size: .85rem; }
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid #cbd5e1; border-top-color: #2563eb;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

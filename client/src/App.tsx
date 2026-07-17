@@ -10,6 +10,7 @@ export default function App() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Asset | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const refresh = useCallback(async () => {
     const data = query.trim() ? await searchAssets(query) : await listAssets();
@@ -26,8 +27,17 @@ export default function App() {
         <h1>Knowledge Management System</h1>
       </header>
       <div className="controls">
-        <UploadPanel onUploaded={refresh} />
+        <UploadPanel onUploaded={refresh} onBusyChange={setUploading} />
         <SearchBar value={query} onChange={setQuery} />
+      </div>
+      {/* Fixed-height row: reserves space so the spinner never shifts the gallery. */}
+      <div className="upload-status" aria-live="polite">
+        {uploading && (
+          <>
+            <span className="spinner" role="status" aria-label="Uploading" />
+            <span className="upload-status-text">Uploading &amp; analyzing…</span>
+          </>
+        )}
       </div>
       <Gallery assets={assets} onSelect={setSelected} />
       {selected && (
