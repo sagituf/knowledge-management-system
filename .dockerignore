@@ -4,3 +4,8 @@ data
 .git
 *.log
 .env
+.idea/
+.superpowers/
+docs/
+*.md
+Junior Home Assignment.pdf
