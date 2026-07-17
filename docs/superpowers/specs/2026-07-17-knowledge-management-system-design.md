@@ -40,8 +40,10 @@ Single full-stack container, Node/TypeScript.
   binaries may be unavailable. DB file at `data/knowledge.db`; uploaded files
   under `data/uploads/`. The entire `data/` directory is the persistence unit
   and the container volume mount point.
-- **AI:** `@anthropic-ai/sdk`, Claude `claude-opus-4-8` with vision. Model is
-  configurable via the `ANTHROPIC_MODEL` env var.
+- **AI:** `@anthropic-ai/sdk`, Claude `claude-sonnet-5` with vision (chosen over
+  `claude-opus-4-8`: this is short metadata extraction, not deep reasoning, so
+  Sonnet's near-Opus vision quality at lower cost/latency is the better fit).
+  Model is configurable via the `ANTHROPIC_MODEL` env var.
 
 Rationale for single container: simplest artifact to build, run locally, and
 deploy within the time budget; the assignment wants one containerized app.
