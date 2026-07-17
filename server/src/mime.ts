@@ -1,10 +1,6 @@
 import type { AssetKind } from "./types.ts";
 
-/**
- * Image MIME types Claude's vision API accepts. An image outside this set can be
- * stored but would fail metadata generation, so we reject it at upload instead of
- * silently storing an un-searchable asset.
- */
+/** Image MIME types Claude's vision API can read. */
 export const SUPPORTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -12,12 +8,18 @@ export const SUPPORTED_IMAGE_TYPES = [
   "image/webp",
 ];
 
+/** True when Claude vision can process this image type. */
+export function isSupportedImageType(mimeType: string): boolean {
+  return SUPPORTED_IMAGE_TYPES.includes(mimeType);
+}
+
 /**
- * Classify an uploaded file by MIME type, or return null if it is not a
- * supported image or a text file.
+ * Classify an uploaded file as an image or text asset, or null if it is neither.
+ * All image types are accepted for storage; whether the AI can describe a given
+ * image is a separate check (see isSupportedImageType).
  */
 export function classifyUpload(mimeType: string): AssetKind | null {
-  if (SUPPORTED_IMAGE_TYPES.includes(mimeType)) return "image";
+  if (mimeType.startsWith("image/")) return "image";
   if (mimeType.startsWith("text/")) return "text";
   return null;
 }

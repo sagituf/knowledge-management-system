@@ -4,10 +4,10 @@ import express from "express";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import { config } from "./config.ts";
-import { insertAsset, listAssets, getAsset, deleteAsset, updateAssetMetadata } from "./db.ts";
+import { insertAsset, listAssets, getAsset, deleteAsset } from "./db.ts";
 import { searchAssets } from "./search.ts";
 import { generateImageMetadata, generateTextMetadata } from "./ai.ts";
-import { classifyUpload, SUPPORTED_IMAGE_TYPES } from "./mime.ts";
+import { classifyUpload, isSupportedImageType, SUPPORTED_IMAGE_TYPES } from "./mime.ts";
 import type { Asset } from "./types.ts";
 
 const upload = multer({
@@ -57,7 +57,7 @@ router.post("/assets", upload.single("file"), async (req, res) => {
   const kind = classifyUpload(file.mimetype);
   if (!kind) {
     return res.status(400).json({
-      error: `unsupported file type: ${file.mimetype}. Supported: text files, and ${SUPPORTED_IMAGE_TYPES.join(", ")} images.`,
+      error: `unsupported file type: ${file.mimetype}. Only text files and images are accepted.`,
     });
   }
 
@@ -68,14 +68,24 @@ router.post("/assets", upload.single("file"), async (req, res) => {
 
   let metadata = { description: "", tags: [] as string[], keywords: [] as string[] };
   let extractedText = "";
+  // Reason to surface in the description when no AI metadata could be produced.
+  let unavailableReason = "";
+
   if (kind === "image") {
-    metadata = await generateImageMetadata(file.buffer.toString("base64"), file.mimetype);
+    if (isSupportedImageType(file.mimetype)) {
+      metadata = await generateImageMetadata(file.buffer.toString("base64"), file.mimetype);
+    } else {
+      unavailableReason = `Cannot generate AI metadata: the AI can't read ${file.mimetype} images (supported formats: ${SUPPORTED_IMAGE_TYPES.join(", ")}). Re-upload in one of those formats to get a description.`;
+    }
   } else {
     extractedText = file.buffer.toString("utf-8");
     metadata = await generateTextMetadata(extractedText);
   }
 
   const aiGenerated = hasMetadata(metadata);
+  if (!aiGenerated && !unavailableReason) {
+    unavailableReason = "AI metadata could not be generated (the AI service was unavailable).";
+  }
 
   const asset: Asset = {
     id,
@@ -85,7 +95,8 @@ router.post("/assets", upload.single("file"), async (req, res) => {
     mimeType: file.mimetype,
     sizeBytes: file.size,
     createdAt: new Date().toISOString(),
-    description: metadata.description,
+    // On failure, store the reason in the description so it's visible on the asset.
+    description: aiGenerated ? metadata.description : unavailableReason,
     tags: metadata.tags,
     keywords: metadata.keywords,
     extractedText,
@@ -102,29 +113,6 @@ router.delete("/assets/:id", (req, res) => {
   fs.rmSync(path.join(config.uploadsDir, asset.storedName), { force: true });
   deleteAsset(asset.id);
   res.status(204).end();
-});
-
-// Re-run AI metadata generation on an already-stored asset and update it.
-router.post("/assets/:id/reevaluate", async (req, res) => {
-  const asset = getAsset(req.params.id);
-  if (!asset) return res.status(404).json({ error: "not found" });
-
-  if (asset.kind === "image" && !SUPPORTED_IMAGE_TYPES.includes(asset.mimeType)) {
-    return res.status(400).json({
-      error: `cannot generate metadata for ${asset.mimeType}; re-upload as ${SUPPORTED_IMAGE_TYPES.join(", ")}.`,
-    });
-  }
-
-  const filePath = path.join(config.uploadsDir, asset.storedName);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "file missing" });
-
-  const metadata =
-    asset.kind === "image"
-      ? await generateImageMetadata(fs.readFileSync(filePath).toString("base64"), asset.mimeType)
-      : await generateTextMetadata(fs.readFileSync(filePath, "utf-8"));
-
-  updateAssetMetadata(asset.id, { ...metadata, aiGenerated: hasMetadata(metadata) });
-  res.json(getAsset(asset.id));
 });
 
 // Convert multer errors (e.g. file exceeds the size limit) to 400 JSON so the
