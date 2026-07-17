@@ -2,7 +2,7 @@
 FROM node:24-slim AS client-build
 WORKDIR /app/client
 COPY client/package.json client/package-lock.json* ./
-RUN npm install
+RUN npm ci
 COPY client/ ./
 RUN npm run build
 
@@ -15,7 +15,7 @@ WORKDIR /app
 
 # server deps
 COPY server/package.json server/package-lock.json* ./server/
-RUN cd server && npm install
+RUN cd server && npm ci
 
 # server source + built client
 COPY server/ ./server/
@@ -25,6 +25,11 @@ ENV PORT=3000
 ENV DATA_DIR=/data
 VOLUME /data
 EXPOSE 3000
+
+# Run as the non-root `node` user (built into node:*-slim images). /data and
+# /app must be writable by it first, since VOLUME/COPY above create them as root.
+RUN mkdir -p /data && chown -R node:node /data /app
+USER node
 
 WORKDIR /app/server
 CMD ["npm", "start"]

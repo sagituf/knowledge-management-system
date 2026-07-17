@@ -24,8 +24,8 @@ cd client && npm install && npm run dev      # frontend on :5173
 cd client && npm run build                   # produces client/dist
 cd server && npm start                        # serves API + client/dist on :3000
 
-# Tests (the only test suite — the pure search module):
-cd server && node --test src/search.test.ts   # runs this one file
+# Tests (two files — search.test.ts and mime.test.ts):
+cd server && npm test   # runs both via `node --test`
 # Node >=24 strips TypeScript types natively; no flag needed.
 
 # Type-check (no emit):
@@ -39,7 +39,8 @@ docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-... -v kms-data:/data kms
 
 Config via env (see `.env.example`; real values go in `server/.env`, git-ignored):
 `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (default `claude-sonnet-5`), `PORT` (3000),
-`DATA_DIR` (default `./data`).
+`DATA_DIR` (default: repo-root `data/`; an explicit value is resolved relative
+to the current working directory).
 
 ## Architecture & non-obvious constraints
 

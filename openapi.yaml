@@ -182,7 +182,9 @@ paths:
         - $ref: "#/components/parameters/AssetId"
       responses:
         "200":
-          description: The file, as an attachment.
+          description: >
+            The file, as an attachment. Content-Type varies by the asset's mime
+            type (e.g. an image download reports `image/png`), same as `/raw`.
           content:
             application/octet-stream:
               schema:

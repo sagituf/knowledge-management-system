@@ -30,7 +30,7 @@ Set via environment (see `.env.example`):
 | `ANTHROPIC_API_KEY` | (none)             | Enables AI metadata. Without it, uploads still work but metadata is empty. |
 | `ANTHROPIC_MODEL`   | `claude-sonnet-5`  | Claude model used for metadata           |
 | `PORT`              | `3000`             | HTTP port                                |
-| `DATA_DIR`          | `./data`           | Where the DB and uploads are stored      |
+| `DATA_DIR`          | repo-root `data/`  | Where the DB and uploads are stored. An explicit value is resolved relative to the current working directory. |
 
 Without an API key the app still runs and is fully browsable — uploads simply
 store the file with empty metadata (`aiGenerated: false`), and search falls back
@@ -89,6 +89,8 @@ disk at `/data`, or use a host with a persistent volume, to keep data.
 | GET    | `/api/assets/search?q=` | Keyword search                    |
 | GET    | `/api/assets/:id`       | Single asset + metadata           |
 | GET    | `/api/assets/:id/raw`   | Serve the file bytes              |
+| GET    | `/api/assets/:id/download` | Download the file (as an attachment) |
+| DELETE | `/api/assets/:id`       | Delete an asset                   |
 | GET    | `/api/health`           | Health + whether AI is configured |
 
 ## How search works
@@ -103,10 +105,11 @@ document and a text file that mentions the word.
 
 ## Tests
 
-The search ranking is pure and unit-tested:
+The search ranking (`search.ts`) and mime classification (`mime.ts`) are pure
+and unit-tested:
 
 ```bash
-cd server && node --test src/search.test.ts
+cd server && npm test
 ```
 
 ## AI tools used during development
