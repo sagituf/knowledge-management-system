@@ -14,10 +14,17 @@ const app = express();
 
 app.use("/api", router);
 
+// Unknown /api/* routes get a JSON 404 (not the SPA fallback below).
+app.use("/api", (_req, res) => {
+  res.status(404).json({ error: "not found" });
+});
+
 // Serve the built frontend if present (production/container).
+// A pattern-less fallback (no "*") serves index.html for client-side routes and
+// works under both Express 4 and 5.
 if (fs.existsSync(clientDist)) {
   app.use(express.static(clientDist));
-  app.get("*", (_req, res) => {
+  app.use((_req, res) => {
     res.sendFile(path.join(clientDist, "index.html"));
   });
 }

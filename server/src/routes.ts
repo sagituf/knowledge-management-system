@@ -93,3 +93,12 @@ router.post("/assets", upload.single("file"), async (req, res) => {
   insertAsset(asset);
   res.status(201).json(asset);
 });
+
+// Convert multer errors (e.g. file exceeds the size limit) to 400 JSON so the
+// client sees a structured error instead of Express's default HTML 500.
+router.use((err: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
