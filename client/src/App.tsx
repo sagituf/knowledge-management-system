@@ -1,17 +1,36 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { Asset } from "./api.ts";
+import { listAssets, searchAssets } from "./api.ts";
+import { UploadPanel } from "./components/UploadPanel.tsx";
+import { SearchBar } from "./components/SearchBar.tsx";
+import { Gallery } from "./components/Gallery.tsx";
+import { AssetDetail } from "./components/AssetDetail.tsx";
 
 export default function App() {
-  const [ai, setAi] = useState<boolean | null>(null);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Asset | null>(null);
+
+  const refresh = useCallback(async () => {
+    const data = query.trim() ? await searchAssets(query) : await listAssets();
+    setAssets(data);
+  }, [query]);
+
   useEffect(() => {
-    fetch("/api/health")
-      .then((r) => r.json())
-      .then((d) => setAi(d.ai))
-      .catch(() => setAi(null));
-  }, []);
+    refresh().catch(() => setAssets([]));
+  }, [refresh]);
+
   return (
     <main>
-      <h1>Knowledge Management System</h1>
-      <p>AI configured: {ai === null ? "unknown" : String(ai)}</p>
+      <header className="app-header">
+        <h1>Knowledge Management System</h1>
+      </header>
+      <div className="controls">
+        <UploadPanel onUploaded={refresh} />
+        <SearchBar value={query} onChange={setQuery} />
+      </div>
+      <Gallery assets={assets} onSelect={setSelected} />
+      {selected && <AssetDetail asset={selected} onClose={() => setSelected(null)} />}
     </main>
   );
 }
