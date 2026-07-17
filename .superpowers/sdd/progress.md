@@ -8,3 +8,4 @@ Task 1-5 (backend track): complete (commits 3540049..bf57aea, review clean, merg
 Merged both tracks into build/kms.
 Task 8 (docker + README): complete (commit bc6fa3a), image builds and runs, container smoke-test clean.
 Integration fix: ce5c85d (data dir before sqlite open).
+Final whole-branch review: APPROVE_WITH_MINOR (0 critical/important). Minors 1-3 fixed (commit e6ce23c); minor 4 (substring match) is expected behavior, no change.
