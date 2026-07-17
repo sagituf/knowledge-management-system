@@ -4,6 +4,8 @@ data
 .git
 *.log
 .env
+**/.env
+**/.env.*
 .idea/
 .superpowers/
 docs/
