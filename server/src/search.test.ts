@@ -32,6 +32,13 @@ test("matches 'document' in both an image and a text file", () => {
   assert.deepEqual(ids, ["img", "txt"]);
 });
 
+test("all query tokens must match (AND): 'black hair' excludes a 'hair'-only asset", () => {
+  const woman = asset({ id: "woman", description: "woman with long black hair", keywords: ["black hair"] });
+  const poodle = asset({ id: "poodle", description: "a brown poodle", keywords: ["curly hair dog"] });
+  const results = searchAssets([poodle, woman], "black hair");
+  assert.deepEqual(results.map((r) => r.id), ["woman"]);
+});
+
 test("ranks more matches higher", () => {
   const strong = asset({ id: "strong", description: "black cat", keywords: ["cat", "black"] });
   const weak = asset({ id: "weak", description: "a black car" });

@@ -30,10 +30,10 @@ function countOccurrences(haystack: string, needle: string): number {
 }
 
 /**
- * Rank assets by how well they match the query.
- * Score = (# distinct tokens that appear) * 10 + (total occurrences).
- * The token-coverage term dominates so an asset matching more of the query
- * always outranks one that merely repeats a single token.
+ * Return assets that contain EVERY query token (AND semantics), ranked by
+ * relevance. Score = (# distinct tokens that appear) * 10 + (total occurrences);
+ * since matches must contain all tokens, ranking is effectively by how often the
+ * terms occur across the asset's searchable fields.
  */
 export function searchAssets(assets: Asset[], query: string): Asset[] {
   const tokens = tokenize(query);
@@ -48,7 +48,10 @@ export function searchAssets(assets: Asset[], query: string): Asset[] {
       if (n > 0) distinct += 1;
       occurrences += n;
     }
-    return { asset, score: distinct * 10 + occurrences, matched: distinct > 0 };
+    // AND semantics: an asset matches only if EVERY query token appears in it.
+    // This keeps a two-word query like "black hair" from surfacing an asset
+    // that merely contains "hair". Occurrences still drive ranking among matches.
+    return { asset, score: distinct * 10 + occurrences, matched: distinct === tokens.length };
   });
 
   return scored
