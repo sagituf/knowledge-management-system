@@ -1,0 +1,16 @@
+# Render Blueprint — deploys the single Docker container as a web service.
+# In the Render dashboard: New → Blueprint → connect this repo. Render reads this
+# file, builds the Dockerfile, and deploys. Set ANTHROPIC_API_KEY as a secret
+# (it is intentionally not stored here).
+services:
+  - type: web
+    name: knowledge-management-system
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # Set this in the Render dashboard (Environment → Add Secret). Never commit it.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # Render injects PORT and DATA_DIR is set in the Dockerfile (/data).

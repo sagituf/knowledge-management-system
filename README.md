@@ -70,6 +70,16 @@ docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-... -v kms-data:/data kms
 Data (SQLite DB + uploaded files) persists in the `kms-data` volume, so it
 survives container restarts and redeploys.
 
+## Deploy (Render)
+
+A `render.yaml` blueprint is included. In the [Render](https://render.com)
+dashboard: **New → Blueprint**, connect this repository, and Render builds the
+Dockerfile and deploys a web service. Then set `ANTHROPIC_API_KEY` as a secret
+under the service's **Environment** settings. Render injects `PORT`
+automatically. On the free plan, storage is ephemeral (uploads reset on
+redeploy) and the service sleeps when idle — fine for a demo; attach a Render
+disk at `/data`, or use a host with a persistent volume, to keep data.
+
 ## API
 
 | Method | Path                    | Purpose                           |
